@@ -1,0 +1,18 @@
+version: "1.0"
+services:
+  gz-demomic-product:
+    image: gz-demomic-product:0.0.1-SNAPSHOT
+    container_name: gz-demomic-product
+    ports:
+      - "8088:8080"
+    depends_on:
+      - postgres
+  postgres:
+    container_name: demomic-lisence-db
+    image: postgres
+    environment:
+      POSTGRES_DB: DEMOMIC_LICENSE
+      POSTGRES_USER: DEMOMIC_LICENSE
+      POSTGRES_PASSWORD: DEMOMIC_LICENSE
+    ports:
+      - "5432:5432"

@@ -7,12 +7,21 @@ services:
       - "8088:8080"
     depends_on:
       - postgres
+  gz-demomic-licence:
+    image: gz-demomic-license:0.0.1-SNAPSHOT
+    container_name: gz-demomic-license
+    ports:
+      - "8090:8080"
+    depends_on:
+      - postgres
   postgres:
-    container_name: demomic-lisence-db
+    container_name: postgres
     image: postgres
+    volumes:
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_DB: DEMOMIC_LICENSE
-      POSTGRES_USER: DEMOMIC_LICENSE
-      POSTGRES_PASSWORD: DEMOMIC_LICENSE
+      POSTGRES_MULTIPLE_DATABASES: DEMOMIC_LICENSE,DEMOMIC_PRODUCT
+      POSTGRES_USER: GZ_DEMOMIC
+      POSTGRES_PASSWORD: GZ_DEMOMIC
     ports:
       - "5432:5432"

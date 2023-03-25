@@ -1,19 +1,6 @@
 version: "1.0"
 services:
-  gz-demomic-product:
-    image: gz-demomic-product:0.0.1-SNAPSHOT
-    container_name: gz-demomic-product
-    ports:
-      - "8088:8080"
-    depends_on:
-      - postgres
-  gz-demomic-licence:
-    image: gz-demomic-license:0.0.1-SNAPSHOT
-    container_name: gz-demomic-license
-    ports:
-      - "8090:8080"
-    depends_on:
-      - postgres
+
   postgres:
     container_name: postgres
     image: postgres
@@ -25,3 +12,56 @@ services:
       POSTGRES_PASSWORD: GZ_DEMOMIC
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      backend:
+        aliases:
+          - "database"
+
+  demomic-config:
+    image: demomic-config:0.0.1-SNAPSHOT
+    container_name: demomic-config
+    ports:
+      - "9000:9000"
+    networks:
+      backend:
+        aliases:
+          - "demomic-config"
+
+  demomic-licence:
+    image: demomic-license:0.0.1-SNAPSHOT
+    container_name: demomic-license
+    ports:
+      - "8090:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      demomic-config:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "demomic-license"
+
+  demomic-product:
+    image: demomic-product:0.0.1-SNAPSHOT
+    container_name: demomic-product
+    ports:
+      - "8100:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      demomic-config:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "demomic-product"
+
+networks:
+  backend:
+    driver: bridge
